@@ -38,4 +38,10 @@ UserSchema.methods.createJWT = function () {
   });
 };
 
+// compare password - mongoose middleware
+UserSchema.methods.comparePassword = async function (canditatePassword) {
+  const isMatch = await bcrypt.compare(canditatePassword, this.password)
+  return isMatch
+}
+
 module.exports = mongoose.model('User', UserSchema);
