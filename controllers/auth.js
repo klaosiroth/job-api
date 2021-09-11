@@ -24,15 +24,18 @@ const register = async (req, res) => {
 
   const user = await User.create({ ...req.body });
 
-  // generate token - controller
-  const payload = {
-    userId: user._id,
-    name: user.name,
-  };
+  // // generate token - controller
+  // const payload = {
+  //   userId: user._id,
+  //   name: user.name,
+  // };
 
-  const token = jwt.sign(payload, 'JWTSECRET', {
-    expiresIn: '30d',
-  });
+  // const token = jwt.sign(payload, 'JWTSECRET', {
+  //   expiresIn: '30d',
+  // });
+
+  // generate token - instance method (mongoose)
+  const token = user.createJWT();
 
   res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
 };
