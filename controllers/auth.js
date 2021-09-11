@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError } = require('../errors');
@@ -22,7 +23,18 @@ const register = async (req, res) => {
   // };
 
   const user = await User.create({ ...req.body });
-  res.status(StatusCodes.CREATED).json({ user });
+
+  // generate token - controller
+  const payload = {
+    userId: user._id,
+    name: user.name,
+  };
+
+  const token = jwt.sign(payload, 'JWTSECRET', {
+    expiresIn: '30d',
+  });
+
+  res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
 };
 
 const login = async (req, res) => {
