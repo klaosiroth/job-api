@@ -9,10 +9,16 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     msg: err.message || 'Something went wrong try again later',
   };
 
-  // if (err instanceof CustomAPIError) {
-  //   return res.status(err.statusCode).json({ msg: err.message });
-  // }
+  // validation error
+  if (err.name === 'ValidationError') {
+    // console.log(Object.values(err.errors));
+    customError.msg = Object.values(err.errors)
+      .map((item) => item.message)
+      .join(',');
+    customError.statusCode = 400;
+  }
 
+  // duplicate error
   if (err.code && err.code === 11000) {
     customError.msg = `Duplicate value entered for ${Object.keys(
       err.keyValue
@@ -22,7 +28,11 @@ const errorHandlerMiddleware = (err, req, res, next) => {
 
   return res.status(customError.statusCode).json({ msg: customError.msg });
 
-  // return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ err })
+  // if (err instanceof CustomAPIError) {
+  //   return res.status(err.statusCode).json({ msg: err.message });
+  // }
+
+  // return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ err });
 };
 
 module.exports = errorHandlerMiddleware;
